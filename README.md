@@ -51,6 +51,8 @@ dependencies {
 This artifact is a GPL build. Applications that use it must comply with GPL obligations and the licenses bundled
 inside the AAR.
 
+后续发布新版本 AAR 的操作说明见 [JITPACK_RELEASE.md](JITPACK_RELEASE.md)。
+
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
 `FFmpegKit` is a collection of tools to use `FFmpeg`<sup>1</sup> in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.

@@ -22,6 +22,35 @@ If you're looking for a replacement, please check out the community-maintained f
 | [Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
 | [React Native](https://www.npmjs.com/search?q=ffmpeg%20kit) |
 
+## Android 16 KB GPL Full AAR
+
+This fork publishes a prebuilt Android `gpl-full` AAR through JitPack. The AAR is built with Android NDK 28 and
+contains `arm64-v8a` and `armeabi-v7a` native libraries, excluding `x86` and `x86_64`.
+
+Add JitPack to your Gradle repositories:
+
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Then depend on the tagged release:
+
+```gradle
+dependencies {
+    implementation 'com.github.TooWhiteT.ffmpeg-kit-16k:ffmpeg-kit-gpl-full:<tag>'
+}
+```
+
+This artifact is a GPL build. Applications that use it must comply with GPL obligations and the licenses bundled
+inside the AAR.
+
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 
 `FFmpegKit` is a collection of tools to use `FFmpeg`<sup>1</sup> in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.

@@ -1,0 +1,72 @@
+plugins {
+    id 'maven-publish'
+}
+
+group = System.getenv('GROUP') ?: 'com.github.TooWhiteT.ffmpeg-kit-16k'
+version = System.getenv('VERSION') ?: 'local-SNAPSHOT'
+
+def publishedArtifactId = 'ffmpeg-kit-gpl-full'
+def aarFile = layout.projectDirectory.file('prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar')
+
+tasks.register('verifyAarForPublishing') {
+    inputs.file(aarFile)
+
+    doLast {
+        def file = aarFile.asFile
+        if (!file.isFile()) {
+            throw new GradleException("Missing AAR artifact: ${file}")
+        }
+        if (file.length() == 0L) {
+            throw new GradleException("AAR artifact is empty: ${file}")
+        }
+    }
+}
+
+publishing {
+    publications {
+        ffmpegKitGplFull(MavenPublication) {
+            artifactId = publishedArtifactId
+            artifact(aarFile) {
+                extension = 'aar'
+                builtBy tasks.named('verifyAarForPublishing')
+            }
+
+            pom {
+                name = 'FFmpegKit GPL Full 16K Android AAR'
+                description = 'Prebuilt FFmpegKit Android GPL full AAR built with NDK 28 and 16 KB page-size alignment for 64-bit native libraries.'
+                url = 'https://github.com/TooWhiteT/ffmpeg-kit-16k'
+
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'TooWhiteT'
+                        name = 'TooWhiteT'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:https://github.com/TooWhiteT/ffmpeg-kit-16k.git'
+                    developerConnection = 'scm:git:https://github.com/TooWhiteT/ffmpeg-kit-16k.git'
+                    url = 'https://github.com/TooWhiteT/ffmpeg-kit-16k'
+                }
+            }
+
+            pom.withXml {
+                def root = asNode()
+                def dependencies = root.appendNode('dependencies')
+                def dependency = dependencies.appendNode('dependency')
+                dependency.appendNode('groupId', 'com.arthenica')
+                dependency.appendNode('artifactId', 'smart-exception-java')
+                dependency.appendNode('version', '0.2.1')
+                dependency.appendNode('scope', 'compile')
+            }
+        }
+    }
+}

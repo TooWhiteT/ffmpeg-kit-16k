@@ -1,6 +1,13 @@
 /.tmp/
+/.gradle/
 /.gradle-home/
+/build/
 /*.log
-/prebuilt/
+/prebuilt/*
+!/prebuilt/bundle-android-aar/
+/prebuilt/bundle-android-aar/*
+!/prebuilt/bundle-android-aar/ffmpeg-kit/
+/prebuilt/bundle-android-aar/ffmpeg-kit/*
+!/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar
 .DS_Store
 .idea

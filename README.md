@@ -44,7 +44,7 @@ Then depend on the tagged release:
 
 ```gradle
 dependencies {
-    implementation 'com.github.TooWhiteT.ffmpeg-kit-16k:ffmpeg-kit-gpl-full:<tag>'
+    implementation 'com.github.TooWhiteT:ffmpeg-kit-16k:<tag>'
 }
 ```
 

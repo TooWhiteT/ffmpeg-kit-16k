@@ -2,10 +2,10 @@ plugins {
     id 'maven-publish'
 }
 
-group = System.getenv('GROUP') ?: 'com.github.TooWhiteT.ffmpeg-kit-16k'
+group = System.getenv('GROUP') ?: 'com.github.TooWhiteT'
 version = System.getenv('VERSION') ?: 'local-SNAPSHOT'
 
-def publishedArtifactId = 'ffmpeg-kit-gpl-full'
+def publishedArtifactId = 'ffmpeg-kit-16k'
 def aarFile = layout.projectDirectory.file('prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar')
 
 tasks.register('verifyAarForPublishing') {

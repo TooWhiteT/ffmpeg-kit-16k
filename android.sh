@@ -168,6 +168,26 @@ for disabled_library in ${disabled_libraries[@]}; do
   set_library "${disabled_library}" 0
 done
 
+# Disabling gnutls is necessary when the OpenSSL/SRT backend is selected,
+# but gnutls also owns a few shared virtual dependencies in set_library().
+if [[ ${ENABLED_LIBRARIES[LIBRARY_GNUTLS]} -eq 0 ]]; then
+  if [[ -n ${BUILD_FULL} ]]; then
+    set_library "gmp" 1
+  fi
+
+  if [[ ${ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_LAME]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_LIBASS]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_LIBXML2]} -eq 1 ]]; then
+    set_virtual_library "libiconv" 1
+  fi
+
+  if [[ ${ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_LIBASS]} -eq 1 ]]; then
+    set_virtual_library "libuuid" 1
+  fi
+
+  if [[ ${ENABLED_LIBRARIES[LIBRARY_FREETYPE]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_LIBPNG]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[LIBRARY_TESSERACT]} -eq 1 ]]; then
+    set_virtual_library "zlib" 1
+  fi
+fi
+
 # IF HELP DISPLAYED EXIT
 if [[ -n ${DISPLAY_HELP} ]]; then
   display_help

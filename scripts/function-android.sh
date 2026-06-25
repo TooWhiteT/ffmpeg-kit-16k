@@ -91,7 +91,7 @@ APP_PLATFORM := android-${API}
 
 APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
 
-APP_LDFLAGS := -Wl,--hash-style=both
+APP_LDFLAGS := -Wl,--hash-style=both -Wl,-z,max-page-size=16384
 EOF
 }
 
@@ -312,7 +312,7 @@ get_app_specific_cflags() {
   local APP_FLAGS=""
   case $1 in
   xvidcore)
-    APP_FLAGS=""
+    APP_FLAGS="-std=gnu99"
     ;;
   ffmpeg)
     APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
@@ -329,7 +329,13 @@ get_app_specific_cflags() {
   rubberband)
     APP_FLAGS="-std=c99 -Wno-unused-function"
     ;;
-  libvpx | openssl | shine | srt)
+  sdl)
+    APP_FLAGS="-std=gnu99 -Wno-unused-function -Wno-incompatible-function-pointer-types"
+    ;;
+  shine)
+    APP_FLAGS="-std=gnu99 -Wno-unused-function"
+    ;;
+  libvpx | openssl | srt)
     APP_FLAGS="-Wno-unused-function"
     ;;
   soxr | snappy | libwebp)
@@ -482,7 +488,7 @@ get_ldflags() {
   fi
   local COMMON_LINKED_LIBS=$(get_common_linked_libraries "$1")
 
-  echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
+  echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,-z,max-page-size=16384 -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
 }
 
 create_mason_cross_file() {
@@ -917,11 +923,12 @@ EOF
 
 create_zlib_system_package_config() {
   ZLIB_VERSION=$(grep '#define ZLIB_VERSION' "${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/"${TOOLCHAIN}"/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+  local ZLIB_HOST="${HOST:-$(get_host)}"
 
   cat >"${INSTALL_PKG_CONFIG_DIR}/zlib.pc" <<EOF
 prefix="${ANDROID_SYSROOT}"/usr
 exec_prefix=\${prefix}
-libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
+libdir=${ANDROID_SYSROOT}/usr/lib/${ZLIB_HOST}/${API}
 includedir=\${prefix}/include
 
 Name: zlib
@@ -1014,6 +1021,8 @@ android_ndk_cmake() {
   echo ${cmake} \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_ROOT}"/build/cmake/android.toolchain.cmake \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DBUILD_TESTING=OFF \
     -DCMAKE_SYSROOT="${ANDROID_SYSROOT}" \
     -DCMAKE_FIND_ROOT_PATH="${ANDROID_SYSROOT}" \
     -DCMAKE_INSTALL_PREFIX="${LIB_INSTALL_PREFIX}" \

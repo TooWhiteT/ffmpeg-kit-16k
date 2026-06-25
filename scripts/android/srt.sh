@@ -23,9 +23,18 @@ esac
 # WORKAROUND TO GENERATE BASE BUILD FILES
 ./configure || echo "" 2>/dev/null 1>/dev/null
 
-cmake -Wno-dev \
+SRT_CMAKE=$(find "${ANDROID_SDK_ROOT}"/cmake -path \*/bin/cmake -type f | sort -V | head -n 1)
+if [[ -z ${SRT_CMAKE} ]]; then
+  SRT_CMAKE=$(command -v cmake)
+fi
+
+"${SRT_CMAKE}" -Wno-dev \
+ -G "Unix Makefiles" \
  -DUSE_ENCLIB=openssl \
  -DCMAKE_VERBOSE_MAKEFILE=0 \
+ -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+ -DBUILD_TESTING=OFF \
+ -DCMAKE_MAKE_PROGRAM="$(command -v make)" \
  -DCMAKE_C_FLAGS="${CFLAGS}" \
  -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
  -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \

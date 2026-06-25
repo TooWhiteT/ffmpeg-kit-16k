@@ -11,6 +11,14 @@ ${SED_INLINE} 's|gitlab.com/gnutls/abi-dump|github.com/arthenica/abi-dump|g' "${
 ${SED_INLINE} 's|gitlab.com/gnutls/cligen|github.com/arthenica/cligen|g' "${BASEDIR}"/src/"${LIB_NAME}"/.gitmodules || return 1
 ${SED_INLINE} 's|gitlab.com/redhat-crypto/tests/interop|github.com/arthenica/redhat-crypto-tests-interop|g' "${BASEDIR}"/src/"${LIB_NAME}"/.gitmodules || return 1
 
+# Newer autopoint rejects configure.ac files that contain both gettext
+# version macros. The release still bootstraps correctly with VERSION only.
+${SED_INLINE} '/m4_ifdef(\[AM_GNU_GETTEXT_REQUIRE_VERSION\],\[/d' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac || return 1
+${SED_INLINE} '/AM_GNU_GETTEXT_REQUIRE_VERSION/d' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac || return 1
+${SED_INLINE} '/AM_GNU_GETTEXT_VERSION(\[0.19\])/{n
+/^])$/d
+}' "${BASEDIR}"/src/"${LIB_NAME}"/configure.ac || return 1
+
 # UPDATE BUILD FLAGS
 export CFLAGS="$(get_cflags ${LIB_NAME}) -I${LIB_INSTALL_BASE}/libiconv/include"
 export CXXFLAGS=$(get_cxxflags "${LIB_NAME}")
@@ -22,6 +30,12 @@ export HOGWEED_CFLAGS="-I${LIB_INSTALL_BASE}/nettle/include"
 export HOGWEED_LIBS="-L${LIB_INSTALL_BASE}/nettle/lib -lhogweed -L${LIB_INSTALL_BASE}/gmp/lib -lgmp"
 export GMP_CFLAGS="-I${LIB_INSTALL_BASE}/gmp/include"
 export GMP_LIBS="-L${LIB_INSTALL_BASE}/gmp/lib -lgmp"
+
+if [[ -x /opt/homebrew/opt/bison/bin/bison ]]; then
+  export PARSE_DATETIME_BISON="/opt/homebrew/opt/bison/bin/bison"
+elif [[ -x /usr/local/opt/bison/bin/bison ]]; then
+  export PARSE_DATETIME_BISON="/usr/local/opt/bison/bin/bison"
+fi
 
 # SET BUILD OPTIONS
 ASM_OPTIONS=""
@@ -42,6 +56,15 @@ if [[ ! -f "${BASEDIR}"/src/"${LIB_NAME}"/configure ]] || [[ ${RECONF_gnutls} -e
   ./bootstrap --skip-po || return 1
   git submodule update --remote gnulib || return 1
   overwrite_file ./gnulib/lib/fpending.c ./src/gl/fpending.c || return 1
+fi
+
+if ! grep -q "ffmpeg-kit android mktime_z fallback" "${BASEDIR}"/src/"${LIB_NAME}"/src/gl/nstrftime.c; then
+  ${SED_INLINE} '/#define TM_YEAR_BASE 1900/a\
+\
+#if defined(__ANDROID__) && !defined(mktime_z)\
+/* ffmpeg-kit android mktime_z fallback */\
+# define mktime_z(tz, tm) mktime (tm)\
+#endif' "${BASEDIR}"/src/"${LIB_NAME}"/src/gl/nstrftime.c || return 1
 fi
 
 ./configure \
@@ -67,9 +90,15 @@ fi
   --disable-full-test-suite \
   --host="${HOST}" || return 1
 
-make -j$(get_cpu_count) || return 1
+if [[ -n ${PARSE_DATETIME_BISON} ]]; then
+  make -C src/gl PARSE_DATETIME_BISON="${PARSE_DATETIME_BISON}" generate-parse-datetime || return 1
+fi
 
-make install || return 1
+make -C gl -j$(get_cpu_count) || return 1
+
+make -C lib -j$(get_cpu_count) || return 1
+
+make -C lib install || return 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_gnutls_package_config "3.7.9" || return 1

@@ -14,11 +14,17 @@ esac
 mkdir -p "${BUILD_DIR}" || return 1
 cd "${BUILD_DIR}" || return 1
 
+CMAKE_BIN=$(find "${ANDROID_SDK_ROOT}"/cmake -path \*/bin/cmake -type f -print -quit)
+if [[ -z ${CMAKE_BIN} ]]; then
+  CMAKE_BIN=$(command -v cmake)
+fi
+
 # WORKAROUND TO DETECT ASM FLAGS PROPERLY
 ${SED_INLINE} 's/ ${CPUINFO}/ "${CPUINFO}"/g' "${BASEDIR}"/src/"${LIB_NAME}"/CMakeModules/FindSSE.cmake 1>>"${BASEDIR}"/build.log 2>&1 || return 1
 
-cmake -Wno-dev \
+"${CMAKE_BIN}" -Wno-dev \
   -DCMAKE_VERBOSE_MAKEFILE=0 \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DCMAKE_C_FLAGS="${CFLAGS}" \
   -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
   -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \

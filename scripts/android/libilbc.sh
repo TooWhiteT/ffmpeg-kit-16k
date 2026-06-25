@@ -7,8 +7,17 @@ git submodule update --init || return 1
 mkdir -p "${BUILD_DIR}" || return 1
 cd "${BUILD_DIR}" || return 1
 
-cmake -Wno-dev \
+LIBILBC_CMAKE=$(find "${ANDROID_SDK_ROOT}"/cmake -path \*/bin/cmake -type f | sort -V | head -n 1)
+if [[ -z ${LIBILBC_CMAKE} ]]; then
+  LIBILBC_CMAKE=$(command -v cmake)
+fi
+
+"${LIBILBC_CMAKE}" -Wno-dev \
+  -G "Unix Makefiles" \
   -DCMAKE_VERBOSE_MAKEFILE=0 \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DBUILD_TESTING=OFF \
+  -DCMAKE_MAKE_PROGRAM="$(command -v make)" \
   -DCMAKE_C_FLAGS="${CFLAGS}" \
   -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
   -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \

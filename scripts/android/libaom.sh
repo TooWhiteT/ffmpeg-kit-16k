@@ -10,10 +10,10 @@ arm-v7a)
   ASM_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=0 -DHAVE_NEON=0"
   ;;
 arm-v7a-neon)
-  ASM_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
+  ASM_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=0 -DHAVE_NEON=0"
   ;;
 arm64-v8a)
-  ASM_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
+  ASM_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=0 -DHAVE_NEON=0"
   ;;
 x86)
   ASM_OPTIONS="-DENABLE_SSE=1 -DHAVE_SSE=1 -DENABLE_SSE3=1 -DHAVE_SSE3=1"
@@ -26,8 +26,17 @@ esac
 mkdir -p "${BUILD_DIR}" || return 1
 cd "${BUILD_DIR}" || return 1
 
-cmake -Wno-dev \
+LIBAOM_CMAKE=$(find "${ANDROID_SDK_ROOT}"/cmake -path \*/bin/cmake -type f | sort -V | head -n 1)
+if [[ -z ${LIBAOM_CMAKE} ]]; then
+  LIBAOM_CMAKE=$(command -v cmake)
+fi
+
+"${LIBAOM_CMAKE}" -Wno-dev \
+  -G "Unix Makefiles" \
   -DCMAKE_VERBOSE_MAKEFILE=0 \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DBUILD_TESTING=OFF \
+  -DCMAKE_MAKE_PROGRAM="$(command -v make)" \
   -DCONFIG_PIC=1 \
   -DCMAKE_C_FLAGS="${CFLAGS}" \
   -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \

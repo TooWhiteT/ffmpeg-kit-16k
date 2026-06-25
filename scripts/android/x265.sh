@@ -20,11 +20,18 @@ esac
 mkdir -p "${BUILD_DIR}" || return 1
 cd "${BUILD_DIR}" || return 1
 
+CMAKE_BIN=$(find "${ANDROID_SDK_ROOT}"/cmake -path \*/bin/cmake -type f -print -quit)
+if [[ -z ${CMAKE_BIN} ]]; then
+  CMAKE_BIN=$(command -v cmake)
+fi
+
 # WORKAROUND TO FIX static_assert ERRORS
 ${SED_INLINE} 's/gnu++98/c++11/g' "${BASEDIR}"/src/"${LIB_NAME}"/source/CMakeLists.txt || return 1
+${SED_INLINE} 's/cmake_policy(SET CMP0025 OLD)/cmake_policy(SET CMP0025 NEW)/g;s/cmake_policy(SET CMP0054 OLD)/cmake_policy(SET CMP0054 NEW)/g' "${BASEDIR}"/src/"${LIB_NAME}"/source/CMakeLists.txt || return 1
 
-cmake -Wno-dev \
+"${CMAKE_BIN}" -Wno-dev \
   -DCMAKE_VERBOSE_MAKEFILE=0 \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DCMAKE_C_FLAGS="${CFLAGS}" \
   -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
   -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \

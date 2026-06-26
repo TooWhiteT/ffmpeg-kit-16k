@@ -1,5 +1,25 @@
 # FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v6.0-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
 
+## 16k Support
+
+does not include x86 && x86_64 architecture
+
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+dependencies {
+    implementation 'com.github.TooWhiteT:ffmpeg-kit-16k:gpl-full-1.0'
+    // or
+    implementation 'com.github.TooWhiteT:ffmpeg-kit-16k:full-1.0'
+}
+```
+
 ## Notice
 FFmpegKit has been officially retired. There will be no further `ffmpeg-kit` releases.
 
@@ -21,37 +41,6 @@ If you're looking for a replacement, please check out the community-maintained f
 | [Android](https://central.sonatype.com/search?q=ffmpeg+kit) |
 | [Flutter](https://pub.dev/packages?q=ffmpeg+kit) |
 | [React Native](https://www.npmjs.com/search?q=ffmpeg%20kit) |
-
-## Android 16 KB GPL Full AAR
-
-This fork publishes a prebuilt Android `gpl-full` AAR through JitPack. The AAR is built with Android NDK 28 and
-contains `arm64-v8a` and `armeabi-v7a` native libraries, excluding `x86` and `x86_64`.
-
-Add JitPack to your Gradle repositories:
-
-```gradle
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
-
-Then depend on the tagged release:
-
-```gradle
-dependencies {
-    implementation 'com.github.TooWhiteT:ffmpeg-kit-16k:<tag>'
-}
-```
-
-This artifact is a GPL build. Applications that use it must comply with GPL obligations and the licenses bundled
-inside the AAR.
-
-后续发布新版本 AAR 的操作说明见 [JITPACK_RELEASE.md](JITPACK_RELEASE.md)。
 
 <img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
 

@@ -9,5 +9,6 @@
 !/prebuilt/bundle-android-aar/ffmpeg-kit/
 /prebuilt/bundle-android-aar/ffmpeg-kit/*
 !/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar
+!/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-full.aar
 .DS_Store
 .idea

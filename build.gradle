@@ -6,7 +6,8 @@ group = System.getenv('GROUP') ?: 'com.github.TooWhiteT'
 version = System.getenv('VERSION') ?: 'local-SNAPSHOT'
 
 def publishedArtifactId = 'ffmpeg-kit-16k'
-def aarFile = layout.projectDirectory.file('prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar')
+//def aarFile = layout.projectDirectory.file('prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-gpl-full.aar')
+def aarFile = layout.projectDirectory.file('prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit-full.aar')
 
 tasks.register('verifyAarForPublishing') {
     inputs.file(aarFile)
